@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "Usine.h"
+
 int main(int argc, char** argv)
 {
 
@@ -12,7 +14,9 @@ int main(int argc, char** argv)
     }else
     {
 
+        Usine* usine = new_usine();
 
+        start_usine(usine);
 
     }
 
