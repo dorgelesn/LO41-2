@@ -1,6 +1,8 @@
 EXEC=LO41
 
-SOURCES=main.c Usine.c Convoyeur.c Superviseur.c
+SOURCES=main.c Usine.c Convoyeur.c Superviseur.c \
+		Retrait.c Alimentation.c Type.c Produit.c \
+		Table.c Machine.c
 
 EXEC_DIR=bin
 OBJ_DIR=obj
@@ -12,7 +14,7 @@ IDIR=-I /usr/include/
 LDIR=-L /usr/lib -L /usr/local/lib -L /usr/lib64 -L /usr/lib/x86_64-linux-gnu
 
 CFLAGS=-Wall -Wextra -O3 -g3 -Wno-unused-variable -Wno-unused-parameter
-LFLAGS=
+LFLAGS=-lpthread
 
 CC=gcc
 
