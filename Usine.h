@@ -3,11 +3,13 @@
 
 #include "Convoyeur.h"
 #include "Superviseur.h"
+#include "Type.h"
 
 typedef struct {
 
     Convoyeur* m__convoyeur;
     Superviseur* m__superviseur;
+    Type* m__types[1]; //Producted product types
 
 } Usine;
 

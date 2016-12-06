@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Table* new_table()
+Table* new_table(Type** types)
 {
 
     Table* t = malloc(sizeof(Table));
 
-    //t->
+    t->m__types = types;
 
     return t;
 

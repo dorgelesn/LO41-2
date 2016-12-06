@@ -18,6 +18,8 @@ int main(int argc, char** argv)
 
         start_usine(usine);
 
+        delete_usine(usine);
+
     }
 
     return 0;

@@ -16,6 +16,8 @@ Superviseur* new_superviseur()
 void delete_superviseur(Superviseur* superviseur)
 {
 
+    printf("[Machine]: destructor\n");
+
     free(superviseur);
 
 }

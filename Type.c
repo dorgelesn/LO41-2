@@ -6,10 +6,13 @@
 Type* new_type(int tmps, int tmps_max)
 {
 
+    printf("[Type]: constructor\n");
+
     Type* t = malloc(sizeof(Type));
 
     t->m__temps = tmps;
     t->m__temps_max = tmps_max;
+    printf("[Type] constructor(): %p\n", t);
 
     return t;
 
@@ -18,6 +21,9 @@ Type* new_type(int tmps, int tmps_max)
 
 void delete_type(Type* type)
 {
+
+    printf("[Type]: destructor\n");
+    printf("[Type] destructor(): %p\n", &type);
 
     free(type);
 

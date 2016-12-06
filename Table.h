@@ -15,7 +15,7 @@ typedef struct
 
 } Table;
 
-Table* new_table();
+Table* new_table(Type** types);
 void delete_table(Table* table);
 
 Produit* table_get_produit(Table* table);
