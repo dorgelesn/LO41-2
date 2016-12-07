@@ -15,8 +15,8 @@ typedef struct
 
 } Produit;
 
-Produit* new_produit(Type* t);
-void delete_produit(Produit* produit);
+Produit* produit_new(Type* t);
+void produit_delete(Produit* produit);
 
 bool produit_get_defaillance(Produit* produit);
 

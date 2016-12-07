@@ -9,8 +9,8 @@ typedef struct
 
 } Type;
 
-Type* new_type(int tmps, int tmps_max);
-void delete_type(Type* type);
+Type* type_new(int tmps, int tmps_max);
+void type_delete(Type* type);
 
 int type_get_temps(Type* type);
 int type_get_temps_max(Type* type);

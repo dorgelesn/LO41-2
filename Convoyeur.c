@@ -3,8 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Convoyeur* new_convoyeur(Alimentation* alim, Retrait* retrait, Table** tables)
+#include "Affichage.h"
+
+Convoyeur* convoyeur_new(Alimentation* alim, Retrait* retrait, Table** tables)
 {
+
+    afficher_debug("[Convoyeur]: constructor\n");
 
     Convoyeur* c = malloc(sizeof(Convoyeur));
 
@@ -12,31 +16,42 @@ Convoyeur* new_convoyeur(Alimentation* alim, Retrait* retrait, Table** tables)
     c->m__retrait = retrait;
     c->m__tables = tables;
 
+    c->m__base = machine_new(&convoyeur_start);
+
     return c;
 
 }
 
 
-void delete_convoyeur(Convoyeur* convoyeur)
+void convoyeur_delete(Convoyeur* convoyeur)
 {
 
-    printf("[Convoyeur]: destructor\n");
+    afficher_debug("[Convoyeur]: destructor\n");
 
-    printf("[Convoyeur] destructeur(): 1\n");
-    delete_alimentation(convoyeur->m__alimentation);
-    printf("[Convoyeur] destructeur(): 2\n");
-    delete_retrait(convoyeur->m__retrait);
-    printf("[Convoyeur] destructeur(): 3\n");
+    alimentation_delete(convoyeur->m__alimentation);
+    retrait_delete(convoyeur->m__retrait);
 
     //free all the tables
 
-    delete_table(convoyeur->m__tables[0]);
-    delete_table(convoyeur->m__tables[1]);
-    delete_table(convoyeur->m__tables[2]);
+    table_delete(convoyeur->m__tables[0]);
+    table_delete(convoyeur->m__tables[1]);
+    table_delete(convoyeur->m__tables[2]);
 
     free(convoyeur->m__tables);
 
+    machine_delete(convoyeur->m__base);
+
     free(convoyeur);
+
+}
+
+
+void* convoyeur_start(void* args)
+{
+
+    afficher_debug("[Convoyeur]: ==convoyeur_start==\n");
+
+    return 0;
 
 }
 

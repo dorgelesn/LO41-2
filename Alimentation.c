@@ -3,33 +3,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void* alimentation_start(void* argv);
+#include "Affichage.h"
 
-Alimentation* new_alimentation()
+Alimentation* alimentation_new()
 {
 
-    printf("[Alimentation] : constructor\n");
+    afficher_debug("[Alimentation] : constructor\n");
 
     Alimentation* a = malloc(sizeof(Alimentation));
-    a->base = new_machine(&alimentation_start);
+    a->m__base = machine_new(&alimentation_start);
 
     return a;
 
 }
 
 
-void delete_alimentation(Alimentation* alimentation)
+void alimentation_delete(Alimentation* alimentation)
 {
 
-    printf("[Alimentation]: destructeur\n");
+    afficher_debug("[Alimentation]: destructor\n");
     //free attente
-    printf("[Alimentation] destructeur(): 1\n");
 
-    delete_machine(alimentation->base);
-    printf("[Alimentation] destructeur(): 2\n");
+    machine_delete(alimentation->m__base);
 
     free(alimentation);
-    printf("[Alimentation] destructeur(): 3\n");
 
 }
 
@@ -37,17 +34,8 @@ void delete_alimentation(Alimentation* alimentation)
 void* alimentation_start(void* argv)
 {
 
-    printf("[Alimentation] : alimentation_start\n");
+    afficher_debug("[Alimentation] : ==alimentation_start==\n");
 
-    for(int i = 0; i < 100; i++)
-    {
-
-        printf("[Alimentation] alimentation_start(): test\n");
-
-        usleep(10000);
-
-    }
-
-    return;
+    return 0;
 
 }

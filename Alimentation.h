@@ -7,13 +7,15 @@
 typedef struct
 {
 
-    Machine* base;
+    Machine* m__base;
 
     Produit** m__attente;
 
 } Alimentation;
 
-Alimentation* new_alimentation();
-void delete_alimentation(Alimentation* alimentation);
+Alimentation* alimentation_new();
+void alimentation_delete(Alimentation* alimentation);
+
+void* alimentation_start(void* args);
 
 #endif

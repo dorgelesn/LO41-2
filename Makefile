@@ -2,7 +2,7 @@ EXEC=LO41
 
 SOURCES=main.c Usine.c Convoyeur.c Superviseur.c \
 		Retrait.c Alimentation.c Type.c Produit.c \
-		Table.c Machine.c
+		Table.c Machine.c Affichage.c
 
 EXEC_DIR=bin
 OBJ_DIR=obj

@@ -16,8 +16,8 @@ typedef struct
 
 } Machine;
 
-Machine* new_machine(void* ( *thread_fonction)(void*));
-void delete_machine(Machine* machine);
+Machine* machine_new(void* ( *thread_fonction)(void*));
+void machine_delete(Machine* machine);
 
 void machine_start(Machine* machine);
 

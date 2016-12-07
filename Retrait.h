@@ -6,11 +6,13 @@
 typedef struct
 {
 
-    Machine base;
+    Machine* m__base;
 
 } Retrait;
 
-Retrait* new_retrait();
-void delete_retrait(Retrait* retrait);
+Retrait* retrait_new();
+void retrait_delete(Retrait* retrait);
+
+void* retrait_start(void* args);
 
 #endif

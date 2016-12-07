@@ -13,9 +13,9 @@ typedef struct {
 
 } Usine;
 
-Usine* new_usine();
-void delete_usine(Usine* usine);
+Usine* usine_new();
+void usine_delete(Usine* usine);
 
-void start_usine(Usine* usine);
+void* usine_start(void* args);
 
 #endif

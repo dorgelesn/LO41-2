@@ -10,7 +10,7 @@
 typedef struct
 {
 
-    Machine base;
+    Machine* m__base;
 
     Alimentation* m__alimentation;
     Retrait* m__retrait;
@@ -21,8 +21,10 @@ typedef struct
 
 } Convoyeur;
 
-Convoyeur* new_convoyeur(Alimentation* alim, Retrait* retrait, Table** tables);
-void delete_convoyeur(Convoyeur* convoyeur);
+Convoyeur* convoyeur_new(Alimentation* alim, Retrait* retrait, Table** tables);
+void convoyeur_delete(Convoyeur* convoyeur);
+
+void* convoyeur_start(void* args);
 
 void convoyeur_set_produit(Convoyeur* convoyeur, Produit* produit);
 

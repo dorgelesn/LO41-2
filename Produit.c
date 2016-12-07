@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Produit* new_produit(Type* t)
+#include "Affichage.h"
+
+Produit* produit_new(Type* t)
 {
 
     Produit* p = malloc(sizeof(Produit));
@@ -16,7 +18,7 @@ Produit* new_produit(Type* t)
 }
 
 
-void delete_produit(Produit* produit)
+void produit_delete(Produit* produit)
 {
 
     free(produit);

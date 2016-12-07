@@ -8,15 +8,17 @@
 typedef struct
 {
 
-    Machine base;
+    Machine* m__base;
 
     Type** m__types;
     Produit* m__produit;
 
 } Table;
 
-Table* new_table(Type** types);
-void delete_table(Table* table);
+Table* table_new(Type** types);
+void table_delete(Table* table);
+
+void* table_start(void* args);
 
 Produit* table_get_produit(Table* table);
 bool table_is_occupe(Table* table);

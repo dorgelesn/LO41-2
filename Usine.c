@@ -5,57 +5,55 @@
 
 #include <unistd.h>
 
-Usine* new_usine()
+#include "Affichage.h"
+
+Usine* usine_new()
 {
+
+    afficher_debug("[Usine]: constructor\n");
 
     Usine* u = malloc(sizeof(Usine));
 
-    Alimentation* alim = new_alimentation();
-    Retrait* retrait = new_retrait();
+    Alimentation* alim = alimentation_new();
+    Retrait* retrait = retrait_new();
     Table** tables = (Table**) malloc(sizeof(Table) * 3);
 
-    Type* t1 = new_type(10, 30);
+    Type* t1 = type_new(10, 30);
 
     Type* types[1] = {t1};
-    tables[0] = new_table(types);
-    tables[1] = new_table(types);
-    tables[2] = new_table(types);
+    tables[0] = table_new(types);
+    tables[1] = table_new(types);
+    tables[2] = table_new(types);
 
     u->m__types[0] = t1;
 
-    u->m__convoyeur = new_convoyeur(alim, retrait, tables);
-    u->m__superviseur = new_superviseur();
+    u->m__convoyeur = convoyeur_new(alim, retrait, tables);
+    u->m__superviseur = superviseur_new(alim);
 
     return u;
 
 }
 
 
-void delete_usine(Usine* usine)
+void usine_delete(Usine* usine)
 {
 
-    printf("[Usine]: destructor\n");
+    afficher_debug("[Usine]: destructor\n");
 
-    printf("[Usine] destructor(): 0\n");
-    delete_convoyeur(usine->m__convoyeur);
-    printf("[Usine] destructor(): 1\n");
-    delete_superviseur(usine->m__superviseur);
-    printf("[Usine] destructor(): 2\n");
+    convoyeur_delete(usine->m__convoyeur);
+    superviseur_delete(usine->m__superviseur);
 
-    delete_type(usine->m__types[0]);
-    printf("[Usine] destructor(): 3\n");
+    type_delete(usine->m__types[0]);
 
     free(usine);
 
 }
 
-void start_usine(Usine* usine)
+void* usine_start(void* args)
 {
 
-    printf("[Usine] : start_usine\n");
+    afficher_debug("[Usine] : ==usine_start==\n");
 
-    printf("[Usine] start_usine() : %p \n", usine);
-
-    sleep(1);
+    return 0;
 
 }

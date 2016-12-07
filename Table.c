@@ -3,25 +3,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Table* new_table(Type** types)
+#include "Affichage.h"
+
+Table* table_new(Type** types)
 {
+
+    afficher_debug("[Table]: constructor\n");
 
     Table* t = malloc(sizeof(Table));
 
     t->m__types = types;
+    t->m__base = machine_new(&table_start);
 
     return t;
 
 }
 
 
-void delete_table(Table* table)
+void table_delete(Table* table)
 {
 
-    if(table_is_occupe(table))
-        delete_produit(table->m__produit);
+    afficher_debug("[Table]: desctructor\n");
 
+    machine_delete(table->m__base);
     free(table);
+
+}
+
+
+void* table_start(void* args)
+{
+
+    afficher_debug("[Table]: ==table_start==\n");
+
+    return 0;
 
 }
 

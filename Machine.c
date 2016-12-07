@@ -3,10 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Machine* new_machine(void* ( *thread_fonction)(void*))
+#include "Affichage.h"
+
+Machine* machine_new(void* ( *thread_fonction)(void*))
 {
 
-    printf("[Machine] : constructor\n");
+    afficher_debug("[Machine] : constructor\n");
 
     Machine* m = malloc(sizeof(Machine));
 
@@ -19,16 +21,14 @@ Machine* new_machine(void* ( *thread_fonction)(void*))
 }
 
 
-void delete_machine(Machine* machine)
+void machine_delete(Machine* machine)
 {
 
-    printf("[Machine]: destructor\n");
+    afficher_debug("[Machine]: destructor\n");
 
     pthread_join(machine->m__thread, NULL);
-    printf("[Machine] destructor(): 1\n");
 
     free(machine);
-    printf("[Machine] destructor(): 2\n");
 
 }
 
@@ -36,7 +36,7 @@ void delete_machine(Machine* machine)
 void machine_start(Machine* machine)
 {
 
-    printf("[Machine] : machine_start\n");
+    afficher_debug("[Machine] : machine_start\n");
 
     exit(0);
 
