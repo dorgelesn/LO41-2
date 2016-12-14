@@ -18,7 +18,8 @@ Simulation of a chain factory in C language, using threads and shared memory
 
 ## Why ?
 
-The purpose of this project is to show that i understood the subjects that we saw in class.
+The purpose of this project is to show that i understood the subjects that we saw in class of LO41 at UTBM in Belfort,
+in France.
 
 ## Installation
 
