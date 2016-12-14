@@ -2,3 +2,9 @@ obj
 obj/*
 bin
 bin/*
+*.aux
+*.lof
+*.log
+*.out
+*.tex
+*.toc
