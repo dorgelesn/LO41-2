@@ -4,12 +4,13 @@ Simulation of a chain factory in C language, using threads and shared memory
 
 ## Usage
 
+```bash
 ./bin/LO41 [-debug] <produits> <types> <tables>\n\
 \
     -<produits>: fichier contenant les produits a usiner.\
     -<types>: fichier contenant les types de produits.\
     -<tables>: fichier contenant les tables d'usinage.
-```bash
+
 ./bin/LO41 produits.txt types.txt tables.txt
 
 ./bin/LO41 -debug p.txt ty.txt ta.txt
