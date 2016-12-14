@@ -2,54 +2,85 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG
+#include <signal.h>
 
 #include "Affichage.h"
 #include "Usine.h"
 
+Usine* usine;
+
+void stop()
+{
+
+    usine_stop(usine);
+
+    usine_join(usine);
+
+    usine_delete(usine);
+
+    afficheur_unload();
+
+    return;
+
+}
+
+
+void stop_sig(int signal)
+{
+
+    stop();
+
+    exit(0);
+
+}
+
+
 int main(int argc, char** argv)
 {
 
-    if(argc < 2 || argc > 3)
+    if(argc < 4 || argc > 5)
     {
 
-        printf("USAGE: LO41 <file> [-debug]\n\
+        printf("USAGE: LO41 [-debug] <produits> <types> <tables>\n\
 \
-    -<file>: file containing products\n");
+    -<produits>: fichier contenant les produits a usiner.\
+    -<types>: fichier contenant les types de produits.\
+    -<tables>: fichier contenant les tables d'usinage.\n");
 
     }else
     {
 
-        int pos = 1;
         int debug = 0;
-        if(argc > 2)
+        if(argc > 4)
         {
 
             if(!strcmp(argv[1], "-debug"))
             {
-
-                pos = 2;
                 debug = 1;
-
-            }else if(!strcmp(argv[2], "-debug"))
-            {
-
-                pos = 1;
-                debug = 1;
-
             }
 
         }
 
-        printf("File : %s\n\n\n\n", argv[pos]);
+        char* produits = argv[debug+1];
+        char* types = argv[debug+2];
+        char* tables = argv[debug+3];
 
         afficheur_init(debug);
 
-        Usine* usine = usine_new();
+        afficher("Produits : %s", 1, produits);
+        afficher("Types : %s", 2, types);
+        afficher("Tables : %s", 3, tables);
+
+        signal(SIGINT, stop_sig);
+
+        usine = usine_new(produits, types, tables);
 
         usine_start(usine);
 
-        usine_delete(usine);
+        afficher("[Press 'Enter' to quit.]", 39);
+        getchar();
+
+        stop(0);
 
     }
 

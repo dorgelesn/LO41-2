@@ -3,25 +3,35 @@
 
 #include <pthread.h>
 
+#include "Machine.h"
+
 typedef int bool;
 #define true 1
 #define false 0
 
 typedef struct {
 
+    Machine* m__base;
+
     bool m__debug;
-    pthread_mutex_t m__mutex;
-    pthread_cond_t m__attendre;
     bool m__affiche;
+
+    int m__cols;
+    int m__lines;
+
+    char** m__data;
 
 } Afficheur;
 
-Afficheur afficheur;
+Afficheur* afficheur;
 
 void afficheur_init(bool debug);
+void afficheur_unload();
 
-int afficher(const char* format, ...);
+int afficher(const char* format, int line, ...);
 int afficher_debug(const char* format, ... );
+
+void clear();
 
 #endif
 

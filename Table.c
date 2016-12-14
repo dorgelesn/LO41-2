@@ -5,6 +5,8 @@
 
 #include "Affichage.h"
 
+#include "Convoyeur.h"
+
 Table* table_new(Type** types)
 {
 
@@ -12,8 +14,10 @@ Table* table_new(Type** types)
 
     Table* t = malloc(sizeof(Table));
 
+    t->m__base = machine_new();
+
+    t->m__produit = NULL;
     t->m__types = types;
-    t->m__base = machine_new(&table_start);
 
     return t;
 
@@ -31,12 +35,90 @@ void table_delete(Table* table)
 }
 
 
-void* table_start(void* args)
+int table_start(Table* table)
 {
 
-    afficher_debug("[Table]: ==table_start==\n");
+    return machine_start(table->m__base, &table_thread, table);
+
+}
+
+
+int table_join(Table* table)
+{
+
+    afficher_debug("[Table]: ==table_thread_join==\n");
+    return machine_join(table->m__base);
+
+}
+
+
+int table_stop(Table* table)
+{
+
+    afficher_debug("[Table]: ==table_thread_stop==\n");
+    return machine_stop(table->m__base);
+
+}
+
+
+void table_wake(Table* table)
+{
+
+    afficher_debug("[Table]: ==table_thread_wake==\n");
+    machine_wake(table->m__base);
+    return;
+
+}
+
+
+void* table_thread(void* args)
+{
+
+    afficher_debug("[Table]: ==table_thread==\n");
+
+    Table* table = (Table*) args;
+
+    while(!machine_get_should_stop(table->m__base))
+    {
+
+        machine_lock(table->m__base);
+        {
+
+            //Dormir
+            machine_sleep(table->m__base);
+
+        }
+        machine_unlock(table->m__base);
+
+    }
 
     return 0;
+
+}
+
+
+void table_recevoir_produit_convoyeur(Table* table, void* convoyeur, Produit* produit)
+{
+
+    machine_lock(table->m__base);
+
+    if(table->m__produit)
+        machine_wait(table->m__base);
+
+    table->m__produit = produit;
+
+    machine_signal(table->m__base);
+
+    machine_unlock(table->m__base);
+
+}
+
+
+void table_donner_produit_convoyeur(Table* table, void* convoyeur)
+{
+
+    convoyeur_recevoir_produit_table((Convoyeur*)convoyeur, table, table->m__produit);
+    table->m__produit = NULL;
 
 }
 
@@ -44,14 +126,7 @@ void* table_start(void* args)
 Produit* table_get_produit(Table* table)
 {
 
-    return NULL;
+    return table->m__produit;
 
 }
 
-
-bool table_is_occupe(Table* table)
-{
-
-    return false;
-
-}
