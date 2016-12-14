@@ -4,6 +4,8 @@ SOURCES=main.c Usine.c Convoyeur.c Superviseur.c \
 		Retrait.c Alimentation.c Type.c Produit.c \
 		Table.c Machine.c Affichage.c
 
+REPORT=Rapport.tex
+
 EXEC_DIR=bin
 OBJ_DIR=obj
 
@@ -34,3 +36,7 @@ init:
 
 clean:
 	@rm -rf "$(OBJ_DIR)"
+
+report:
+	pdflatex $(REPORT);
+	evince $(REPORT:%.tex=%.pdf)
