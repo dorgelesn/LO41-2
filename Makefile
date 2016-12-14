@@ -1,10 +1,10 @@
 EXEC=LO41
 
-SOURCES=main.c Usine.c Convoyeur.c Superviseur.c \
-		Retrait.c Alimentation.c Type.c Produit.c \
+SOURCES=main.c Factory.c Conveyor.c Supervisor.c \
+		Retrait.c Supplier.c Type.c Product.c \
 		Table.c Machine.c Affichage.c
 
-REPORT=Rapport.tex
+REPORT=Report.tex
 
 EXEC_DIR=bin
 OBJ_DIR=obj

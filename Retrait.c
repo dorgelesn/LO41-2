@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Affichage.h"
+#include "Display.h"
 
 Retrait* retrait_new()
 {
 
-    afficher_debug("[Retrait]: constructor\n");
+    display_debug("[Retrait]: constructor\n");
 
     Retrait* r = malloc(sizeof(Retrait));
 
@@ -22,7 +22,7 @@ Retrait* retrait_new()
 void retrait_delete(Retrait* retrait)
 {
 
-    afficher_debug("[Retrait]: destructor\n");
+    display_debug("[Retrait]: destructor\n");
 
     machine_delete(retrait->m__base);
 
@@ -42,7 +42,7 @@ int retrait_start(Retrait* retrait)
 int retrait_join(Retrait* retrait)
 {
 
-    afficher_debug("[Retrait]: ==retrait_thread_join==\n");
+    display_debug("[Retrait]: ==retrait_thread_join==\n");
     return machine_join(retrait->m__base);
 
 }
@@ -51,7 +51,7 @@ int retrait_join(Retrait* retrait)
 int retrait_stop(Retrait* retrait)
 {
 
-    afficher_debug("[Retrait]: ==retrait_thread_stop==\n");
+    display_debug("[Retrait]: ==retrait_thread_stop==\n");
     return machine_stop(retrait->m__base);
 
 }
@@ -60,7 +60,7 @@ int retrait_stop(Retrait* retrait)
 void retrait_wake(Retrait* retrait)
 {
 
-    afficher_debug("[Retrait]: ==retrait_thread_wake==\n");
+    display_debug("[Retrait]: ==retrait_thread_wake==\n");
     machine_wake(retrait->m__base);
     return;
 
@@ -70,7 +70,7 @@ void retrait_wake(Retrait* retrait)
 void* retrait_thread(void* args)
 {
 
-    afficher_debug("[Retrait]: ==retrait_start==\n");
+    display_debug("[Retrait]: ==retrait_start==\n");
 
     Retrait* retrait = (Retrait*) args;
 
@@ -91,15 +91,15 @@ void* retrait_thread(void* args)
 
 }
 
-void retrait_recevoir_produit_convoyeur(Retrait* retrait, Produit* produit)
+void retrait_receive_product_conveyor(Retrait* retrait, Product* product)
 {
 
     machine_lock(retrait->m__base);
 
-    if(retrait->m__produit)
+    if(retrait->m__product)
         machine_wait(retrait->m__base);
 
-    retrait->m__produit = produit;
+    retrait->m__product = product;
 
     machine_signal(retrait->m__base);
 
@@ -108,10 +108,10 @@ void retrait_recevoir_produit_convoyeur(Retrait* retrait, Produit* produit)
 }
 
 
-void retrait_sortir_produit(Retrait* retrait)
+void retrait_sortir_product(Retrait* retrait)
 {
 
-    produit_delete(retrait->m__produit);
-    retrait->m__produit = NULL;
+    product_delete(retrait->m__product);
+    retrait->m__product = NULL;
 
 }

@@ -3,7 +3,7 @@
 
 #include "Machine.h"
 #include "Type.h"
-#include "Produit.h"
+#include "Product.h"
 
 typedef struct
 {
@@ -11,7 +11,7 @@ typedef struct
     Machine* m__base;
 
     Type** m__types;
-    Produit* m__produit;
+    Product* m__product;
 
 } Table;
 
@@ -24,10 +24,10 @@ int table_stop(Table* table);
 void table_wake(Table* table);
 void* table_thread(void* args);
 
-void table_recevoir_produit_convoyeur(Table* table, void* convoyeur, Produit* produit);
-void table_donner_produit_convoyeur(Table* table, void* convoyeur);
+void table_receive_product_conveyor(Table* table, void* conveyor, Product* product);
+void table_donner_product_conveyor(Table* table, void* conveyor);
 
-Produit* table_get_produit(Table* table);
+Product* table_get_product(Table* table);
 bool table_is_occupe(Table* table);
 
 #endif

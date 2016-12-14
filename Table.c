@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Affichage.h"
+#include "Display.h"
 
-#include "Convoyeur.h"
+#include "Conveyor.h"
 
 Table* table_new(Type** types)
 {
 
-    afficher_debug("[Table]: constructor\n");
+    display_debug("[Table]: constructor\n");
 
     Table* t = malloc(sizeof(Table));
 
     t->m__base = machine_new();
 
-    t->m__produit = NULL;
+    t->m__product = NULL;
     t->m__types = types;
 
     return t;
@@ -27,7 +27,7 @@ Table* table_new(Type** types)
 void table_delete(Table* table)
 {
 
-    afficher_debug("[Table]: desctructor\n");
+    display_debug("[Table]: desctructor\n");
 
     machine_delete(table->m__base);
     free(table);
@@ -46,7 +46,7 @@ int table_start(Table* table)
 int table_join(Table* table)
 {
 
-    afficher_debug("[Table]: ==table_thread_join==\n");
+    display_debug("[Table]: ==table_thread_join==\n");
     return machine_join(table->m__base);
 
 }
@@ -55,7 +55,7 @@ int table_join(Table* table)
 int table_stop(Table* table)
 {
 
-    afficher_debug("[Table]: ==table_thread_stop==\n");
+    display_debug("[Table]: ==table_thread_stop==\n");
     return machine_stop(table->m__base);
 
 }
@@ -64,7 +64,7 @@ int table_stop(Table* table)
 void table_wake(Table* table)
 {
 
-    afficher_debug("[Table]: ==table_thread_wake==\n");
+    display_debug("[Table]: ==table_thread_wake==\n");
     machine_wake(table->m__base);
     return;
 
@@ -74,7 +74,7 @@ void table_wake(Table* table)
 void* table_thread(void* args)
 {
 
-    afficher_debug("[Table]: ==table_thread==\n");
+    display_debug("[Table]: ==table_thread==\n");
 
     Table* table = (Table*) args;
 
@@ -84,7 +84,7 @@ void* table_thread(void* args)
         machine_lock(table->m__base);
         {
 
-            //Dormir
+            //Sleep
             machine_sleep(table->m__base);
 
         }
@@ -97,15 +97,15 @@ void* table_thread(void* args)
 }
 
 
-void table_recevoir_produit_convoyeur(Table* table, void* convoyeur, Produit* produit)
+void table_receive_product_conveyor(Table* table, void* conveyor, Product* product)
 {
 
     machine_lock(table->m__base);
 
-    if(table->m__produit)
+    if(table->m__product)
         machine_wait(table->m__base);
 
-    table->m__produit = produit;
+    table->m__product = product;
 
     machine_signal(table->m__base);
 
@@ -114,19 +114,19 @@ void table_recevoir_produit_convoyeur(Table* table, void* convoyeur, Produit* pr
 }
 
 
-void table_donner_produit_convoyeur(Table* table, void* convoyeur)
+void table_donner_product_conveyor(Table* table, void* conveyor)
 {
 
-    convoyeur_recevoir_produit_table((Convoyeur*)convoyeur, table, table->m__produit);
-    table->m__produit = NULL;
+    conveyor_receive_product_table((Conveyor*)conveyor, table, table->m__product);
+    table->m__product = NULL;
 
 }
 
 
-Produit* table_get_produit(Table* table)
+Product* table_get_product(Table* table)
 {
 
-    return table->m__produit;
+    return table->m__product;
 
 }
 

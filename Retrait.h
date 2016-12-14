@@ -3,14 +3,14 @@
 
 #include "Machine.h"
 
-#include "Produit.h"
+#include "Product.h"
 
 typedef struct
 {
 
     Machine* m__base;
 
-    Produit* m__produit;
+    Product* m__product;
 
 } Retrait;
 
@@ -24,7 +24,7 @@ int retrait_stop(Retrait* retrait);
 void retrait_wake(Retrait* retrait);
 void* retrait_thread(void* args);
 
-void retrait_recevoir_produit_convoyeur(Retrait* retrait, Produit* produit);
-void retrait_donner_produit(Retrait* retrait);
+void retrait_receive_product_conveyor(Retrait* retrait, Product* product);
+void retrait_donner_product(Retrait* retrait);
 
 #endif

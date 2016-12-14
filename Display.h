@@ -28,8 +28,8 @@ Afficheur* afficheur;
 void afficheur_init(bool debug);
 void afficheur_unload();
 
-int afficher(const char* format, int line, ...);
-int afficher_debug(const char* format, ... );
+int display(const char* format, int line, ...);
+int display_debug(const char* format, ... );
 
 void clear();
 

@@ -13,11 +13,11 @@ typedef struct
     Type* m__type;
     bool m__defaillance;
 
-} Produit;
+} Product;
 
-Produit* produit_new(Type* t);
-void produit_delete(Produit* produit);
+Product* product_new(Type* t);
+void product_delete(Product* product);
 
-bool produit_get_defaillance(Produit* produit);
+bool product_get_defaillance(Product* product);
 
 #endif

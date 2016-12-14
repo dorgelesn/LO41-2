@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Affichage.h"
+#include "Display.h"
 
 Machine* machine_new()
 {
 
-    afficher_debug("[Machine] : constructor\n");
+    display_debug("[Machine] : constructor\n");
 
     Machine* m = malloc(sizeof(Machine));
 
@@ -32,7 +32,7 @@ Machine* machine_new()
 void machine_delete(Machine* machine)
 {
 
-    afficher_debug("[Machine]: destructor\n");
+    display_debug("[Machine]: destructor\n");
 
     pthread_attr_destroy(&(machine->m__attr));
 
@@ -52,7 +52,7 @@ int machine_start(Machine* machine, void* ( *thread_fonction)(void*), void* args
 int machine_join(Machine* machine)
 {
 
-    afficher_debug("[Machine]: join\n");
+    display_debug("[Machine]: join\n");
     return pthread_join(machine->m__thread, NULL);
 
 }
@@ -61,7 +61,7 @@ int machine_join(Machine* machine)
 int machine_stop(Machine* machine)
 {
 
-    afficher_debug("[Machine]: stop\n");
+    display_debug("[Machine]: stop\n");
     machine->m__should_stop = true;
     machine_wake(machine);
     return 0;

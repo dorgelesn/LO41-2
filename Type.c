@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Affichage.h"
+#include "Display.h"
 
 Type* type_new(int tmps, int tmps_max)
 {
 
-    afficher_debug("[Type]: constructor\n");
+    display_debug("[Type]: constructor\n");
 
     Type* t = malloc(sizeof(Type));
 
@@ -23,7 +23,7 @@ Type* type_new(int tmps, int tmps_max)
 void type_delete(Type* type)
 {
 
-    afficher_debug("[Type]: destructor\n");
+    display_debug("[Type]: destructor\n");
 
     free(type);
 

@@ -1,4 +1,4 @@
-#include "Affichage.h"
+#include "Display.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -63,7 +63,7 @@ void afficheur_unload()
 }
 
 
-int afficher(const char* format, int line, ...)
+int display(const char* format, int line, ...)
 {
 
     machine_lock(afficheur->m__base);
@@ -102,7 +102,7 @@ int afficher(const char* format, int line, ...)
 }
 
 
-int afficher_debug(const char* format, ... )
+int display_debug(const char* format, ... )
 {
 
     int done = 1;
@@ -112,7 +112,7 @@ int afficher_debug(const char* format, ... )
         va_list arg;
 
         va_start (arg, format);
-        done = afficher(format, 0, arg);
+        done = display(format, 0, arg);
         va_end (arg);
     }
 

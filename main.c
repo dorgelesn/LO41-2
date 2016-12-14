@@ -4,19 +4,19 @@
 
 #include <signal.h>
 
-#include "Affichage.h"
-#include "Usine.h"
+#include "Display.h"
+#include "Factory.h"
 
-Usine* usine;
+Factory* factory;
 
 void stop()
 {
 
-    usine_stop(usine);
+    factory_stop(factory);
 
-    usine_join(usine);
+    factory_join(factory);
 
-    usine_delete(usine);
+    factory_delete(factory);
 
     afficheur_unload();
 
@@ -41,10 +41,10 @@ int main(int argc, char** argv)
     if(argc < 4 || argc > 5)
     {
 
-        printf("USAGE: LO41 [-debug] <produits> <types> <tables>\n\
+        printf("USAGE: LO41 [-debug] <products> <types> <tables>\n\
 \
-    -<produits>: fichier contenant les produits a usiner.\
-    -<types>: fichier contenant les types de produits.\
+    -<products>: fichier contenant les products a factoryr.\
+    -<types>: fichier contenant les types de products.\
     -<tables>: fichier contenant les tables d'usinage.\n");
 
     }else
@@ -61,23 +61,23 @@ int main(int argc, char** argv)
 
         }
 
-        char* produits = argv[debug+1];
+        char* products = argv[debug+1];
         char* types = argv[debug+2];
         char* tables = argv[debug+3];
 
         afficheur_init(debug);
 
-        afficher("Produits : %s", 1, produits);
-        afficher("Types : %s", 2, types);
-        afficher("Tables : %s", 3, tables);
+        display("Products : %s", 1, products);
+        display("Types : %s", 2, types);
+        display("Tables : %s", 3, tables);
 
         signal(SIGINT, stop_sig);
 
-        usine = usine_new(produits, types, tables);
+        factory = factory_new(products, types, tables);
 
-        usine_start(usine);
+        factory_start(factory);
 
-        afficher("[Press 'Enter' to quit.]", 39);
+        display("[Press 'Enter' to quit.]", 39);
         getchar();
 
         stop(0);
