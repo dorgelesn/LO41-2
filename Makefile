@@ -2,7 +2,7 @@ EXEC=LO41
 
 SOURCES=main.c Factory.c Conveyor.c Supervisor.c \
 		Retrait.c Supplier.c Type.c Product.c \
-		Table.c Machine.c Affichage.c
+		Table.c Machine.c Display.c
 
 REPORT=Report.tex
 
