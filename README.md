@@ -9,7 +9,7 @@ Simulation of a chain factory in C language, using threads and shared memory
 
     -<produits>: fichier contenant les produits a usiner.
     -<types>: fichier contenant les types de produits.
-    -<tables>: fichier contenant les tables d'usinage.
+    -<tables>: fichier contenant les tables d\'usinage.
 
 ./bin/LO41 produits.txt types.txt tables.txt
 
