@@ -95,6 +95,12 @@ void product_display(Product* product, int* line)
 
     *(line) = *(line) + 1;
 
-    display("    Product : %i", *line, product->m__progression);
+    display("    Product :", *line);
+
+    *(line) = *(line) + 1;
+    display("    progression : %i", *line, product->m__progression);
+
+
+    *(line) = *(line) + 1;
 
 }

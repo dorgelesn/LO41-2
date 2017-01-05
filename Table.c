@@ -134,7 +134,7 @@ void* table_thread(void* args)
 
     }
 
-    pthread_exit(NULL);
+    pthread_exit(0);
 
     return 0;
 
@@ -207,16 +207,20 @@ void table_display(Table* table, int* line)
 
     *(line) = *(line) + 1;
 
-    display("    Table: %p", *line, table->m__product);
+    display("   Table", *line);
 
     if(table->m__product)
     {
+
+        *(line) = *(line) + 1;
+        display("   product: %p", *line, table->m__product);
         product_display(table->m__product, line);
+
     }else
     {
 
         *(line) = *(line) + 1;
-        display("No product", *line);
+        display("   No product", *line);
 
     }
 

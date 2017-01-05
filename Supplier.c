@@ -149,8 +149,16 @@ void supplier_receive_product_supervisor(Supplier* supplier, Product* product)
 void supplier_give_product_conveyor(Supplier* supplier)
 {
 
-        conveyor_receive_product_supplier(supplier->m__conveyor, supplier, supplier->m__product);
-        supplier->m__product = NULL;
+    conveyor_receive_product_supplier(supplier->m__conveyor, supplier, supplier->m__product);
+    supplier->m__product = NULL;
+
+}
+
+
+Product* supplier_get_product(Supplier* supplier)
+{
+
+    return supplier->m__product;
 
 }
 
@@ -160,6 +168,11 @@ void supplier_display(Supplier* supplier, int* line)
 
     *(line) = *(line) + 1;
 
-    display("Supplier: %p", *line, supplier->m__product);
+    display("Supplier: ", *line);
+
+    *(line) = *(line) + 1;
+    display("   product: %p", *line, supplier->m__product);
+
+    *(line) = *(line) + 1;
 
 }

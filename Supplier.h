@@ -56,6 +56,8 @@ void* supplier_thread(void* args);
 void supplier_receive_product_supervisor(Supplier* supplier, Product* product);
 void supplier_give_product_conveyor(Supplier* supplier);
 
+Product* supplier_get_product(Supplier* supplier);
+
 void supplier_display(Supplier* supplier, int* line);
 
 #endif

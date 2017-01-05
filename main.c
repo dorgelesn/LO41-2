@@ -64,7 +64,7 @@ void stop_sig(int signal)
 int main(int argc, char** argv)
 {
 
-    if(argc < 4 || argc > 5)
+    if(argc < 2 || argc > 3)
     {
 
         printf("USAGE: LO41 [-debug] <products>\n\
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     {
 
         int debug = 0;
-        if(argc > 4)
+        if(argc > 2)
         {
 
             if(!strcmp(argv[1], "-debug"))

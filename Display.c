@@ -119,7 +119,6 @@ int display(const char* format, int line, ...)
 
     }
 
-
     afficheur->m__affiche = false;
 
     machine_signal_receive(afficheur->m__base);

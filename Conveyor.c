@@ -162,7 +162,7 @@ void* conveyor_thread(void* args)
 
     }
 
-    pthread_exit(NULL);
+    pthread_exit(0);
 
     return 0;
 
@@ -281,6 +281,14 @@ void conveyor_display(Conveyor* conveyor, int* line)
 
     *(line) = *(line) + 1;
 
-    display("Conveyor: Position: %i; Product:%p", *line, conveyor->m__position, conveyor->m__product);
+    display("Conveyor: ", *line);
+
+    *(line) = *(line) + 1;
+    display("   position: %i", *line, conveyor->m__position);
+
+    *(line) = *(line) + 1;
+    display("   product:%p", *line, conveyor->m__product);
+
+    *(line) = *(line) + 1;
 
 }

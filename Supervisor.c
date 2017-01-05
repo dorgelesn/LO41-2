@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "Display.h"
 
@@ -36,6 +37,8 @@ Supervisor* supervisor_new(int num_products, int num_types, int num_tables)
 {
 
     display_debug("[Supervisor]: constructor\n");
+
+    srand(time(NULL));
 
     Supervisor* s = malloc(sizeof(Supervisor));
 
@@ -190,39 +193,76 @@ void* supervisor_thread(void* args)
     while(!machine_get_should_stop(supervisor->m__base))
     {
 
-        Type* current_type = product_get_type(supervisor->m__products[supervisor->m__current_product]);
-
-        bool found = false;
-        int i = 0;
-        while(i < supervisor->m__num_tables && !found)
+        if(supervisor->m__current_product < supervisor->m__num_products)
         {
 
-            if(table_get_type(supervisor->m__tables[i]) == current_type)
+            Type* current_type = product_get_type(supervisor->m__products[supervisor->m__current_product]);
+
+            bool found = false;
+            int found_products = 0;// number of product of the same type as the current product, that are in proccess
+            int found_tables = 0;
+            int i = 0;
+
+            if(supplier_get_product(supervisor->m__supplier))
             {
 
-                found = true;
+                found_products++;
 
-            }else
+            }
+
+            if(conveyor_get_product(supervisor->m__conveyor))
             {
 
-                i++;
+                found_products++;
+
+            }
+
+            while(i < supervisor->m__num_tables && !found)
+            {
+
+                if(table_get_type(supervisor->m__tables[i]) == current_type)
+                {
+
+                    found_tables++;
+
+                    if(table_get_product(supervisor->m__tables[i]))
+                    {
+
+                        found_products++;
+
+                    }
+
+                }
+
+                if(found_products < found_tables)
+                {
+
+                    found = true;
+
+                }else
+                {
+
+                    i++;
+
+                }
+
+            }
+
+            if(found)
+            {
+
+                supervisor_give_product_supplier(supervisor, supervisor->m__products[supervisor->m__current_product]);
+
+                supervisor->m__current_product++;
 
             }
 
         }
 
-        if(found)
-        {
-
-            supervisor_give_product_supplier(supervisor, supervisor->m__products[supervisor->m__current_product]);
-
-            supervisor->m__current_product++;
-
-        }
-
-        int line = 5;
+        int line = 0;
 
         clean();
+
         supervisor_display(supervisor, &line);
         supplier_display(supervisor->m__supplier, &line);
         conveyor_display(supervisor->m__conveyor, &line);
@@ -241,7 +281,7 @@ void* supervisor_thread(void* args)
         if(supervisor_finished(supervisor))
         {
 
-            printf("[Supervisor]: ALL PRODUCTS HAVE BEEN PROCESSED !\n");
+            display("[Supervisor]: ALL PRODUCTS HAVE BEEN PROCESSED !", 39);
             pthread_exit(0);
 
         }
@@ -250,6 +290,8 @@ void* supervisor_thread(void* args)
         sleep(1);
 
     }
+
+    pthread_exit(0);
 
     return 0;
 
@@ -268,7 +310,7 @@ void supervisor_give_product_supplier(Supervisor* supervisor, Product* product)
 void supervisor_import_products(Supervisor* supervisor, int num_products)
 {
 
-    supervisor->m__num_products = 4;
+    supervisor->m__num_products = num_products;
     supervisor->m__current_product = 0;
 
     supervisor->m__products = (Product**) malloc(sizeof(Product*) * supervisor->m__num_products);
@@ -276,7 +318,7 @@ void supervisor_import_products(Supervisor* supervisor, int num_products)
     for(int i = 0; i < supervisor->m__num_products; i++)
     {
 
-        supervisor->m__products[i] = product_new(supervisor->m__types[0]);
+        supervisor->m__products[i] = product_new(supervisor->m__types[rand()%supervisor->m__num_types]);
 
     }
 
@@ -286,10 +328,15 @@ void supervisor_import_products(Supervisor* supervisor, int num_products)
 void supervisor_import_types(Supervisor* supervisor, int num_types)
 {
 
-    supervisor->m__num_types = 1;
+    supervisor->m__num_types = num_types;
     supervisor->m__types = (Type**) malloc(sizeof(Type*) * supervisor->m__num_types);
 
-    supervisor->m__types[0] = type_new(3, 30);
+    for(int i = 0; i < supervisor->m__num_types; i++)
+    {
+
+        supervisor->m__types[i] = type_new(3, 30);
+
+    }
 
 }
 
@@ -301,9 +348,12 @@ void supervisor_import_tables(Supervisor* supervisor, int num_tables)
 
     supervisor->m__tables = (Table**) malloc(sizeof(Table*) * supervisor->m__num_tables);
 
-    supervisor->m__tables[0] = table_new(supervisor->m__types[0]);
-    supervisor->m__tables[1] = table_new(supervisor->m__types[0]);
-    supervisor->m__tables[2] = table_new(supervisor->m__types[0]);
+    for(int i = 0; i < supervisor->m__num_tables; i++)
+    {
+
+        supervisor->m__tables[i] = table_new(supervisor->m__types[rand()%supervisor->m__num_types]);
+
+    }
 
 }
 
@@ -331,15 +381,17 @@ void supervisor_display(Supervisor* supervisor, int* line)
 
     *(line) = *(line) + 1;
 
-    display("Supervisor: \n", *(line));
+    display("Supervisor: ", *(line));
+    *(line) = *(line) + 1;
+    display("   current : %i", *(line), supervisor->m__current_product);
 
     for(int i = 0; i < supervisor->m__num_products; i++)
     {
 
-        *(line) = *(line) + 1;
-
         product_display(supervisor->m__products[i], line);
 
     }
+
+    *(line) = *(line) + 1;
 
 }
