@@ -29,6 +29,7 @@
 #define MACHINE_H
 
 #include <pthread.h>
+#include <unistd.h>
 
 typedef int bool;
 #define true 1
@@ -43,7 +44,8 @@ typedef struct
     bool m__defaillance;
 
     pthread_mutex_t m__mutex;
-    pthread_cond_t m__cond;
+    pthread_cond_t m__receive;
+    pthread_cond_t m__give;
     pthread_cond_t m__dormir;
 
     bool m__should_stop;
@@ -60,8 +62,11 @@ int machine_stop(Machine* machine);
 void machine_lock(Machine* machine);
 void machine_unlock(Machine* machine);
 
-void machine_wait(Machine* machine);
-void machine_signal(Machine* machine);
+void machine_wait_receive(Machine* machine);
+void machine_wait_give(Machine* machine);
+void machine_signal_receive(Machine* machine);
+void machine_broadcast_receive(Machine* machine);
+void machine_signal_give(Machine* machine);
 
 void machine_sleep(Machine* machine);
 void machine_wake(Machine* machine);

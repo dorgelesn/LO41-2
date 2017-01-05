@@ -34,14 +34,14 @@
 
 #include "Display.h"
 
-Factory* factory_new(char* products, char* types, char* tables)
+Factory* factory_new(int num_products, int num_types, int num_tables)
 {
 
     display_debug("[Factory]: constructor\n");
 
     Factory* u = malloc(sizeof(Factory));
 
-    u->m__supervisor = supervisor_new(products, types, tables);
+    u->m__supervisor = supervisor_new(num_products, num_types, num_tables);
 
     return u;
 

@@ -39,8 +39,8 @@ Type* type_new(int tmps, int tmps_max)
 
     Type* t = malloc(sizeof(Type));
 
-    t->m__temps = tmps;
-    t->m__temps_max = tmps_max;
+    t->m__time = tmps;
+    t->m__time_max = tmps_max;
 
     return t;
 
@@ -57,17 +57,17 @@ void type_delete(Type* type)
 }
 
 
-int type_get_temps(Type* type)
+int type_get_time(Type* type)
 {
 
-    return 0;
+    return type->m__time;
 
 }
 
 
-int type_get_temps_max(Type* type)
+int type_get_time_max(Type* type)
 {
 
-    return 0;
+    return type->m__time_max;
 
 }

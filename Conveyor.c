@@ -31,8 +31,10 @@
 #include <stdlib.h>
 
 #include "Display.h"
+#include "Supplier.h"
+#include "Supervisor.h"
 
-Conveyor* conveyor_new(Retrait* retrait, Table** tables, int num_tables)
+Conveyor* conveyor_new(void* supervisor, Retrait* retrait, Table** tables, int num_tables)
 {
 
     display_debug("[Conveyor]: constructor\n");
@@ -40,9 +42,11 @@ Conveyor* conveyor_new(Retrait* retrait, Table** tables, int num_tables)
     Conveyor* c = malloc(sizeof(Conveyor));
 
     c->m__base = machine_new();
+    c->m__supervisor = supervisor;
 
     c->m__retrait = retrait;
     c->m__tables = tables;
+    c->m__num_tables = num_tables;
 
     c->m__product = NULL;
     c->m__position = 0;
@@ -76,7 +80,11 @@ int conveyor_join(Conveyor* conveyor)
 {
 
     display_debug("[Conveyor]: ==conveyor_thread_join==\n");
-    return machine_join(conveyor->m__base);
+    int res = machine_join(conveyor->m__base);
+
+    display_debug("[Conveyor]: ==conveyor_thread_join_2==\n");
+
+    return res;
 
 }
 
@@ -108,17 +116,49 @@ void* conveyor_thread(void* args)
     while(!machine_get_should_stop(conveyor->m__base))
     {
 
+        sleep(1);
         machine_lock(conveyor->m__base);
         {
 
-            if(conveyor->m__product)
-                retrait_receive_product_conveyor(conveyor->m__retrait, conveyor->m__product);
-
-            //Sleep
-            machine_sleep(conveyor->m__base);
+            if(!conveyor->m__product)
+                machine_sleep(conveyor->m__base);
 
         }
         machine_unlock(conveyor->m__base);
+
+        if(!machine_get_should_stop(conveyor->m__base))
+        {
+
+            if(product_treated(conveyor->m__product))
+            {
+
+                conveyor_give_product_retrait(conveyor);
+
+            }else
+            {
+
+                if(conveyor->m__position >= conveyor->m__num_tables)
+                {
+
+                    conveyor->m__position = 0;
+
+                }
+
+                if(!table_get_product(conveyor->m__tables[conveyor->m__position]) && (table_get_type(conveyor->m__tables[conveyor->m__position]) == product_get_type(conveyor->m__product)))
+                {
+
+                    conveyor_give_product_table(conveyor, conveyor->m__tables[conveyor->m__position]);
+
+                }else
+                {
+
+                    conveyor->m__position++;
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -129,22 +169,33 @@ void* conveyor_thread(void* args)
 }
 
 
-void conveyor_receive_product_supplier(Conveyor* conveyor, Product* product)
+void conveyor_receive_product_supplier(Conveyor* conveyor, void* supplier, Product* product)
 {
 
     display_debug("[Conveyor]: conveyor_receive_product_supplier\n");
 
+    Supplier* s = (Supplier*) supplier;
+
     machine_lock(conveyor->m__base);
+    {
+
+        if(conveyor->m__product)
+            machine_wait_receive(conveyor->m__base);
+
+    }
+    machine_unlock(conveyor->m__base);
+
+    if(!machine_get_should_stop(s->m__base))
     {
 
         conveyor->m__position = 0;
         conveyor->m__product = product;
 
-        machine_signal(conveyor->m__base);
+        supervisor_wake(conveyor->m__supervisor);
         machine_wake(conveyor->m__base);
 
     }
-    machine_unlock(conveyor->m__base);
+
 
 }
 
@@ -156,53 +207,56 @@ void conveyor_receive_product_table(Conveyor* conveyor, Table* table, Product* p
     {
 
         if(conveyor->m__product)
-            machine_wait(conveyor->m__base);
-
-        int i = 0;
-        bool found_table = false;
-        while(!found_table)
-        {
-
-            if(conveyor->m__tables[i] == table)
-            {
-
-                found_table = true;
-
-            }else
-            {
-
-                i++;
-
-            }
-
-        }
-
-        conveyor->m__position = i + 1; //Décalé de 1 a cause du robot d'supplier du conveyor
-        conveyor->m__product = product;
-
-        machine_signal(conveyor->m__base);
-        machine_wake(conveyor->m__base);
+            machine_wait_receive(conveyor->m__base);
 
     }
     machine_unlock(conveyor->m__base);
 
+    int i = 0;
+    bool found_table = false;
+    while(!found_table)
+    {
+
+        if(conveyor->m__tables[i] == table)
+        {
+
+            found_table = true;
+
+        }else
+        {
+
+            i++;
+
+        }
+
+    }
+
+    conveyor->m__position = i + 1;
+    conveyor->m__product = product;
+
+    machine_wake(conveyor->m__base);
+
+
 }
 
 
-void conveyor_donner_product_table(Conveyor* conveyor, Table* table)
+void conveyor_give_product_table(Conveyor* conveyor, Table* table)
 {
 
     table_receive_product_conveyor(table, conveyor, conveyor->m__product);
     conveyor->m__product = NULL;
+    machine_signal_receive(conveyor->m__base);
 
 }
 
 
-void conveyor_donner_product_retrait(Conveyor* conveyor)
+void conveyor_give_product_retrait(Conveyor* conveyor)
 {
 
-    retrait_receive_product_conveyor(conveyor->m__retrait, conveyor->m__product);
+    retrait_receive_product_conveyor(conveyor->m__retrait, conveyor, conveyor->m__product);
     conveyor->m__product = NULL;
+
+    machine_signal_receive(conveyor->m__base);
 
 }
 
@@ -218,5 +272,15 @@ Product* conveyor_get_product(Conveyor* conveyor)
 {
 
     return conveyor->m__product;
+
+}
+
+
+void conveyor_display(Conveyor* conveyor, int* line)
+{
+
+    *(line) = *(line) + 1;
+
+    display("Conveyor: Position: %i; Product:%p", *line, conveyor->m__position, conveyor->m__product);
 
 }

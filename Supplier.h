@@ -40,12 +40,11 @@ typedef struct
 
     Conveyor* m__conveyor;
 
-    Product** m__products;
-    int m__num_products;
+    Product* m__product;
 
 } Supplier;
 
-Supplier* supplier_new();
+Supplier* supplier_new(Conveyor* conveyor);
 void supplier_delete(Supplier* supplier);
 
 int supplier_start(Supplier* supplier);
@@ -53,5 +52,10 @@ int supplier_join(Supplier* supplier);
 int supplier_stop(Supplier* supplier);
 void supplier_wake(Supplier* supplier);
 void* supplier_thread(void* args);
+
+void supplier_receive_product_supervisor(Supplier* supplier, Product* product);
+void supplier_give_product_conveyor(Supplier* supplier);
+
+void supplier_display(Supplier* supplier, int* line);
 
 #endif

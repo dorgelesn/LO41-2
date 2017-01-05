@@ -32,27 +32,29 @@
 
 #include "Display.h"
 
-Supervisor* supervisor_new(char* products, char* types, char* tables)
+Supervisor* supervisor_new(int num_products, int num_types, int num_tables)
 {
 
     display_debug("[Supervisor]: constructor\n");
 
     Supervisor* s = malloc(sizeof(Supervisor));
 
-
     s->m__base = machine_new();
 
-    supervisor_import_types(s, types);
-    supervisor_import_products(s, products);
-    supervisor_import_tables(s, tables);
+    supervisor_import_types(s, num_types);
+    supervisor_import_products(s, num_products);
+    supervisor_import_tables(s, num_tables);
 
-    Retrait* retrait = retrait_new();
-    Conveyor* conveyor = conveyor_new(retrait, s->m__tables, s->m__num_tables);
-    Supplier* alim = supplier_new(conveyor, s->m__products);
+    Retrait* retrait = retrait_new(s);
+    Conveyor* conveyor = conveyor_new(s, retrait, s->m__tables, s->m__num_tables);
+    Supplier* alim = supplier_new(conveyor);
 
     s->m__supplier = alim;
     s->m__conveyor = conveyor;
     s->m__retrait = retrait;
+
+    s->m__num_finished = 0;
+
 
     return s;
 
@@ -72,13 +74,13 @@ void supervisor_delete(Supervisor* supervisor)
         product_delete(supervisor->m__products[i]);
     free(supervisor->m__products);
 
-    for(int i = 0; i < supervisor->m__num_types; i++)
-        type_delete(supervisor->m__types[i]);
-    free(supervisor->m__types);
-
     for(int i = 0; i < supervisor->m__num_tables; i++)
         table_delete(supervisor->m__tables[i]);
     free(supervisor->m__tables);
+
+    for(int i = 0; i < supervisor->m__num_types; i++)
+        type_delete(supervisor->m__types[i]);
+    free(supervisor->m__types);
 
     machine_delete(supervisor->m__base);
 
@@ -166,6 +168,18 @@ int supervisor_stop(Supervisor* supervisor)
 }
 
 
+void supervisor_wake(void* supervisor)
+{
+
+    Supervisor* s = (Supervisor*) supervisor;
+
+    machine_wake(s->m__base);
+
+    return;
+
+}
+
+
 void* supervisor_thread(void* args)
 {
 
@@ -176,24 +190,63 @@ void* supervisor_thread(void* args)
     while(!machine_get_should_stop(supervisor->m__base))
     {
 
-        for(int i = 0; i < supervisor->m__num_types; i++)
+        Type* current_type = product_get_type(supervisor->m__products[supervisor->m__current_product]);
+
+        bool found = false;
+        int i = 0;
+        while(i < supervisor->m__num_tables && !found)
         {
 
-            display("Type : %p", 5+i, supervisor->m__types[i]);
+            if(table_get_type(supervisor->m__tables[i]) == current_type)
+            {
+
+                found = true;
+
+            }else
+            {
+
+                i++;
+
+            }
 
         }
+
+        if(found)
+        {
+
+            supervisor_give_product_supplier(supervisor, supervisor->m__products[supervisor->m__current_product]);
+
+            supervisor->m__current_product++;
+
+        }
+
+        int line = 5;
+
+        clean();
+        supervisor_display(supervisor, &line);
+        supplier_display(supervisor->m__supplier, &line);
+        conveyor_display(supervisor->m__conveyor, &line);
+
+        line++;
+        display("Tables : ", line);
         for(int i = 0; i < supervisor->m__num_tables; i++)
         {
 
-            display("Table : %p", 8+i, supervisor->m__tables[i]);
+            line++;
+
+            table_display(supervisor->m__tables[i], &line);
 
         }
-        for(int i = 0; i < supervisor->m__num_products; i++)
+
+        if(supervisor_finished(supervisor))
         {
 
-            display("Product : %p", 12+i, supervisor->m__products[i]);
+            printf("[Supervisor]: ALL PRODUCTS HAVE BEEN PROCESSED !\n");
+            pthread_exit(0);
 
         }
+
+        //machine_sleep(supervisor->m__base);
         sleep(1);
 
     }
@@ -203,39 +256,90 @@ void* supervisor_thread(void* args)
 }
 
 
-void supervisor_import_products(Supervisor* supervisor, char* fichier_products)
+void supervisor_give_product_supplier(Supervisor* supervisor, Product* product)
 {
 
-    supervisor->m__num_products = 3;
-    supervisor->m__products = (Product**) malloc(sizeof(Product*) * supervisor->m__num_products);
-
-    supervisor->m__products[0] = product_new(supervisor->m__types[0]);
-    supervisor->m__products[1] = product_new(supervisor->m__types[0]);
-    supervisor->m__products[2] = product_new(supervisor->m__types[0]);
+    supplier_receive_product_supervisor(supervisor->m__supplier, product);
 
 }
 
 
-void supervisor_import_types(Supervisor* supervisor, char* fichier_types)
+
+void supervisor_import_products(Supervisor* supervisor, int num_products)
+{
+
+    supervisor->m__num_products = 4;
+    supervisor->m__current_product = 0;
+
+    supervisor->m__products = (Product**) malloc(sizeof(Product*) * supervisor->m__num_products);
+
+    for(int i = 0; i < supervisor->m__num_products; i++)
+    {
+
+        supervisor->m__products[i] = product_new(supervisor->m__types[0]);
+
+    }
+
+}
+
+
+void supervisor_import_types(Supervisor* supervisor, int num_types)
 {
 
     supervisor->m__num_types = 1;
     supervisor->m__types = (Type**) malloc(sizeof(Type*) * supervisor->m__num_types);
 
-    supervisor->m__types[0] = type_new(10, 30);
+    supervisor->m__types[0] = type_new(3, 30);
 
 }
 
 
-void supervisor_import_tables(Supervisor* supervisor, char* fichier_tables)
+void supervisor_import_tables(Supervisor* supervisor, int num_tables)
 {
 
-    supervisor->m__num_tables = 3;
+    supervisor->m__num_tables = num_tables;
 
     supervisor->m__tables = (Table**) malloc(sizeof(Table*) * supervisor->m__num_tables);
 
-    supervisor->m__tables[0] = table_new(supervisor->m__types);
-    supervisor->m__tables[1] = table_new(supervisor->m__types);
-    supervisor->m__tables[2] = table_new(supervisor->m__types);
+    supervisor->m__tables[0] = table_new(supervisor->m__types[0]);
+    supervisor->m__tables[1] = table_new(supervisor->m__types[0]);
+    supervisor->m__tables[2] = table_new(supervisor->m__types[0]);
+
+}
+
+
+void supervisor_product_finished(Supervisor* supervisor)
+{
+
+    supervisor->m__num_finished++;
+
+}
+
+
+bool supervisor_finished(Supervisor* supervisor)
+{
+
+    bool res = supervisor->m__num_finished == supervisor->m__num_products;
+
+    return res;
+
+}
+
+
+void supervisor_display(Supervisor* supervisor, int* line)
+{
+
+    *(line) = *(line) + 1;
+
+    display("Supervisor: \n", *(line));
+
+    for(int i = 0; i < supervisor->m__num_products; i++)
+    {
+
+        *(line) = *(line) + 1;
+
+        product_display(supervisor->m__products[i], line);
+
+    }
 
 }

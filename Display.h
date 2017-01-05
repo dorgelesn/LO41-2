@@ -58,6 +58,7 @@ void afficheur_unload();
 int display(const char* format, int line, ...);
 int display_debug(const char* format, ... );
 
+void clean();
 void clear();
 
 #endif

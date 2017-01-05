@@ -52,19 +52,30 @@ typedef struct
 
     Product** m__products;
     int m__num_products;
+    int m__current_product;
+
+    int m__num_finished;
 
 } Supervisor;
 
-Supervisor* supervisor_new(char* products, char* types, char* tables);
+Supervisor* supervisor_new(int num_products, int num_types, int num_tables);
 void supervisor_delete(Supervisor* supervisor);
 
 int supervisor_start(Supervisor* supervisor);
 int supervisor_join(Supervisor* supervisor);
 int supervisor_stop(Supervisor* supervisor);
+void supervisor_wake(void* supervisor);
 void* supervisor_thread(void* args);
 
-void supervisor_import_products(Supervisor* supervisor, char* fichier_products);
-void supervisor_import_types(Supervisor* supervisor, char* fichier_types);
-void supervisor_import_tables(Supervisor* supervisor, char* fichier_tables);
+void supervisor_give_product_supplier(Supervisor* supervisor, Product* product);
+
+void supervisor_import_products(Supervisor* supervisor, int num_products);
+void supervisor_import_types(Supervisor* supervisor, int num_types);
+void supervisor_import_tables(Supervisor* supervisor, int num_tables);
+
+void supervisor_product_finished(Supervisor* supervisor);
+bool supervisor_finished(Supervisor* supervisor);
+
+void supervisor_display(Supervisor* supervisor, int* line);
 
 #endif

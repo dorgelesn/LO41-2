@@ -31,15 +31,15 @@
 typedef struct
 {
 
-    int m__temps;
-    int m__temps_max;
+    int m__time;
+    int m__time_max;
 
 } Type;
 
 Type* type_new(int tmps, int tmps_max);
 void type_delete(Type* type);
 
-int type_get_temps(Type* type);
-int type_get_temps_max(Type* type);
+int type_get_time(Type* type);
+int type_get_time_max(Type* type);
 
 #endif

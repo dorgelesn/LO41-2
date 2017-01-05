@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <signal.h>
 
 #include "Display.h"
@@ -68,11 +67,9 @@ int main(int argc, char** argv)
     if(argc < 4 || argc > 5)
     {
 
-        printf("USAGE: LO41 [-debug] <products> <types> <tables>\n\
+        printf("USAGE: LO41 [-debug] <products>\n\
 \
-    -<products>: fichier contenant les products a factoryr.\
-    -<types>: fichier contenant les types de products.\
-    -<tables>: fichier contenant les tables d'usinage.\n");
+    -<products>: product number to give to the factory.\n");
 
     }else
     {
@@ -88,15 +85,15 @@ int main(int argc, char** argv)
 
         }
 
-        char* products = argv[debug+1];
-        char* types = argv[debug+2];
-        char* tables = argv[debug+3];
+        int products = atoi(argv[debug+1]);
+        int types = 1;
+        int tables = 3;
 
         afficheur_init(debug);
 
-        display("Products : %s", 1, products);
-        display("Types : %s", 2, types);
-        display("Tables : %s", 3, tables);
+        display("Products : %i", 1, products);
+        display("Types : %i", 2, types);
+        display("Tables : %i", 3, tables);
 
         signal(SIGINT, stop_sig);
 
@@ -107,7 +104,7 @@ int main(int argc, char** argv)
         display("[Press 'Enter' to quit.]", 39);
         getchar();
 
-        stop(0);
+        stop();
 
     }
 

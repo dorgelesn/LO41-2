@@ -34,7 +34,7 @@
 
 #include "Conveyor.h"
 
-Table* table_new(Type** types)
+Table* table_new(Type* type)
 {
 
     display_debug("[Table]: constructor\n");
@@ -44,7 +44,7 @@ Table* table_new(Type** types)
     t->m__base = machine_new();
 
     t->m__product = NULL;
-    t->m__types = types;
+    t->m__type = type;
 
     return t;
 
@@ -54,7 +54,7 @@ Table* table_new(Type** types)
 void table_delete(Table* table)
 {
 
-    display_debug("[Table]: desctructor\n");
+    display_debug("[Table]: destructor\n");
 
     machine_delete(table->m__base);
     free(table);
@@ -74,7 +74,10 @@ int table_join(Table* table)
 {
 
     display_debug("[Table]: ==table_thread_join==\n");
-    return machine_join(table->m__base);
+    int res =  machine_join(table->m__base);
+    display_debug("[Table]: ==table_thread_join_2==\n");
+
+    return res;
 
 }
 
@@ -111,13 +114,27 @@ void* table_thread(void* args)
         machine_lock(table->m__base);
         {
 
-            //Sleep
-            machine_sleep(table->m__base);
+            if(!table->m__product)
+                machine_sleep(table->m__base);
 
         }
         machine_unlock(table->m__base);
 
+        if(!machine_get_should_stop(table->m__base))
+        {
+
+            if(product_treat(table->m__product))
+            {
+
+                table_give_product_conveyor(table);
+
+            }
+
+        }
+
     }
+
+    pthread_exit(NULL);
 
     return 0;
 
@@ -128,24 +145,43 @@ void table_receive_product_conveyor(Table* table, void* conveyor, Product* produ
 {
 
     machine_lock(table->m__base);
+    {
 
-    if(table->m__product)
-        machine_wait(table->m__base);
+        if(table->m__product)
+            machine_wait_receive(table->m__base);
 
-    table->m__product = product;
-
-    machine_signal(table->m__base);
-
+    }
     machine_unlock(table->m__base);
+
+    if(!machine_get_should_stop(table->m__base))
+    {
+
+        table->m__product = product;
+        table->m__conveyor = conveyor;
+
+        machine_wake(table->m__base);
+
+    }
+
 
 }
 
 
-void table_donner_product_conveyor(Table* table, void* conveyor)
+void table_give_product_conveyor(Table* table)
 {
 
-    conveyor_receive_product_table((Conveyor*)conveyor, table, table->m__product);
-    table->m__product = NULL;
+    Conveyor* c = (Conveyor*) table->m__conveyor;
+
+    machine_lock(table->m__base);
+    {
+
+        conveyor_receive_product_table(c, table, table->m__product);
+        table->m__product = NULL;
+
+        machine_signal_receive(c->m__base);
+
+    }
+    machine_unlock(table->m__base);
 
 }
 
@@ -157,3 +193,31 @@ Product* table_get_product(Table* table)
 
 }
 
+
+Type* table_get_type(Table* table)
+{
+
+    return table->m__type;
+
+}
+
+
+void table_display(Table* table, int* line)
+{
+
+    *(line) = *(line) + 1;
+
+    display("    Table: %p", *line, table->m__product);
+
+    if(table->m__product)
+    {
+        product_display(table->m__product, line);
+    }else
+    {
+
+        *(line) = *(line) + 1;
+        display("No product", *line);
+
+    }
+
+}

@@ -46,7 +46,8 @@ Machine* machine_new()
     pthread_attr_setdetachstate(&(m->m__attr), PTHREAD_CREATE_JOINABLE);
 
     pthread_mutex_init(&(m->m__mutex), NULL);
-    pthread_cond_init(&(m->m__cond), NULL);
+    pthread_cond_init(&(m->m__receive), NULL);
+    pthread_cond_init(&(m->m__give), NULL);
     pthread_cond_init(&(m->m__dormir), NULL);
 
     m->m__should_stop = false;
@@ -62,6 +63,10 @@ void machine_delete(Machine* machine)
     display_debug("[Machine]: destructor\n");
 
     pthread_attr_destroy(&(machine->m__attr));
+
+    pthread_cond_destroy(&(machine->m__receive));
+    pthread_cond_destroy(&(machine->m__give));
+    pthread_cond_destroy(&(machine->m__dormir));
 
     free(machine);
 
@@ -80,6 +85,7 @@ int machine_join(Machine* machine)
 {
 
     display_debug("[Machine]: join\n");
+    machine_wake(machine);
     return pthread_join(machine->m__thread, NULL);
 
 }
@@ -90,6 +96,7 @@ int machine_stop(Machine* machine)
 
     display_debug("[Machine]: stop\n");
     machine->m__should_stop = true;
+    machine_broadcast_receive(machine);
     machine_wake(machine);
     return 0;
 
@@ -112,18 +119,42 @@ void machine_unlock(Machine* machine)
 }
 
 
-void machine_wait(Machine* machine)
+void machine_wait_receive(Machine* machine)
 {
 
-    pthread_cond_wait(&(machine->m__cond), &(machine->m__mutex));
+    pthread_cond_wait(&(machine->m__receive), &(machine->m__mutex));
 
 }
 
 
-void machine_signal(Machine* machine)
+void machine_wait_give(Machine* machine)
 {
 
-    pthread_cond_signal(&(machine->m__cond));
+    pthread_cond_wait(&(machine->m__give), &(machine->m__mutex));
+
+}
+
+
+void machine_signal_receive(Machine* machine)
+{
+
+    pthread_cond_signal(&(machine->m__receive));
+
+}
+
+
+void machine_broadcast_receive(Machine* machine)
+{
+
+    pthread_cond_broadcast(&(machine->m__receive));
+
+}
+
+
+void machine_signal_give(Machine* machine)
+{
+
+    pthread_cond_signal(&(machine->m__give));
 
 }
 
@@ -131,7 +162,8 @@ void machine_signal(Machine* machine)
 void machine_sleep(Machine* machine)
 {
 
-    pthread_cond_wait(&(machine->m__dormir), &(machine->m__mutex));
+    if(!machine->m__should_stop)
+        pthread_cond_wait(&(machine->m__dormir), &(machine->m__mutex));
 
 }
 

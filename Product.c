@@ -38,6 +38,7 @@ Product* product_new(Type* t)
     Product* p = malloc(sizeof(Product));
 
     p->m__type = t;
+    p->m__progression = 0;
     p->m__defaillance = false;
 
     return p;
@@ -48,6 +49,7 @@ Product* product_new(Type* t)
 void product_delete(Product* product)
 {
 
+    display_debug("[Product]: destructor\n");
     free(product);
 
 }
@@ -57,5 +59,42 @@ bool product_get_defaillance(Product* product)
 {
 
     return false;
+
+}
+
+
+bool product_treat(Product* product)
+{
+
+    sleep(1);
+    product->m__progression++;
+
+    return product->m__progression > type_get_time(product->m__type);
+
+}
+
+
+bool product_treated(Product* product)
+{
+
+    return product->m__progression >= type_get_time(product->m__type);
+
+}
+
+
+Type* product_get_type(Product* product)
+{
+
+    return product->m__type;
+
+}
+
+
+void product_display(Product* product, int* line)
+{
+
+    *(line) = *(line) + 1;
+
+    display("    Product : %i", *line, product->m__progression);
 
 }

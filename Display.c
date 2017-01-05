@@ -67,6 +67,7 @@ void afficheur_init(bool debug)
     }
 
     afficheur->m__base = machine_new();
+    afficheur->m__affiche = false;
 
 }
 
@@ -100,15 +101,16 @@ int display(const char* format, int line, ...)
     va_list arg;
 
     if(afficheur->m__affiche)
-        machine_wait(afficheur->m__base);
+        machine_wait_receive(afficheur->m__base);
 
     afficheur->m__affiche = true;
 
+    clear();
+
     va_start(arg, line);
     vsprintf(afficheur->m__data[line], format, arg);
-    va_end(arg),
+    va_end(arg);
 
-    clear();
     for(int i = 0; i < afficheur->m__lines; i++)
     {
 
@@ -120,7 +122,7 @@ int display(const char* format, int line, ...)
 
     afficheur->m__affiche = false;
 
-    machine_signal(afficheur->m__base);
+    machine_signal_receive(afficheur->m__base);
 
     machine_unlock(afficheur->m__base);
 
@@ -139,11 +141,22 @@ int display_debug(const char* format, ... )
         va_list arg;
 
         va_start (arg, format);
-        done = display(format, 0, arg);
+        done = printf(format, arg);
         va_end (arg);
     }
 
     return done;
+
+}
+
+
+void clean()
+{
+
+    for(int i = 0; i < afficheur->m__lines; i++)
+        afficheur->m__data[i][0] = '\0';
+
+    return;
 
 }
 

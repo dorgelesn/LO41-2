@@ -32,7 +32,7 @@
 
 #include "Display.h"
 
-Supplier* supplier_new(Conveyor* conveyor, Product** products, int num_products)
+Supplier* supplier_new(Conveyor* conveyor)
 {
 
     display_debug("[Supplier] : constructor\n");
@@ -41,9 +41,7 @@ Supplier* supplier_new(Conveyor* conveyor, Product** products, int num_products)
     a->m__base = machine_new();
 
     a->m__conveyor = conveyor;
-    a->m__products = products;
-    a->m__num_products = num_products;
-
+    a->m__product = NULL;
     return a;
 
 }
@@ -73,7 +71,11 @@ int supplier_join(Supplier* supplier)
 {
 
     display_debug("[Supplier]: ==supplier_thread_join==\n");
-    return machine_join(supplier->m__base);
+    int res = machine_join(supplier->m__base);
+
+    display_debug("[Supplier]: ==supplier_thread_join_2==\n");
+
+    return res;
 
 }
 
@@ -100,32 +102,64 @@ void* supplier_thread(void* argv)
 
     display_debug("[Supplier] : ==supplier_thread==\n");
 
-    Supplier* alim = (Supplier*) argv;
+    Supplier* supplier = (Supplier*) argv;
 
-    int i = 0;
-    for(; i < alim->m__num_products; i++)
+    while(!machine_get_should_stop(supplier->m__base))
     {
 
-        if(conveyor_get_product(alim->m__conveyor))
-            machine_wait(alim->m__base);
-        conveyor_receive_product_supplier(alim->m__conveyor, alim->m__products[i]);
+        if(!supplier->m__product)
+            machine_sleep(supplier->m__base);
+
+        if(!machine_get_should_stop(supplier->m__base))
+            supplier_give_product_conveyor(supplier);
 
     }
 
-    while(!machine_get_should_stop(alim->m__base))
-    {
-
-        machine_lock(alim->m__base);
-        {
-
-            //Sleep
-            machine_sleep(alim->m__base);
-
-        }
-        machine_unlock(alim->m__base);
-
-    }
+    pthread_exit(0);
 
     return 0;
+
+}
+
+
+void supplier_receive_product_supervisor(Supplier* supplier, Product* product)
+{
+
+    machine_lock(supplier->m__base);
+    {
+
+        if(supplier->m__product)
+            machine_wait_receive(supplier->m__base);
+
+    }
+    machine_unlock(supplier->m__base);
+
+    if(!machine_get_should_stop(supplier->m__base))
+    {
+
+        supplier->m__product = product;
+
+        machine_wake(supplier->m__base);
+
+    }
+
+}
+
+
+void supplier_give_product_conveyor(Supplier* supplier)
+{
+
+        conveyor_receive_product_supplier(supplier->m__conveyor, supplier, supplier->m__product);
+        supplier->m__product = NULL;
+
+}
+
+
+void supplier_display(Supplier* supplier, int* line)
+{
+
+    *(line) = *(line) + 1;
+
+    display("Supplier: %p", *line, supplier->m__product);
 
 }

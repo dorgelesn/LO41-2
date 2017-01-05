@@ -24,24 +24,23 @@
  *
  */
 
-
 #ifndef RETRAIT_H
 #define RETRAIT_H
 
 #include "Machine.h"
-
 #include "Product.h"
 
 typedef struct
 {
 
     Machine* m__base;
+    void* m__supervisor;
 
     Product* m__product;
 
 } Retrait;
 
-Retrait* retrait_new();
+Retrait* retrait_new(void* supervisor);
 void retrait_delete(Retrait* retrait);
 
 
@@ -51,7 +50,7 @@ int retrait_stop(Retrait* retrait);
 void retrait_wake(Retrait* retrait);
 void* retrait_thread(void* args);
 
-void retrait_receive_product_conveyor(Retrait* retrait, Product* product);
-void retrait_donner_product(Retrait* retrait);
+void retrait_receive_product_conveyor(Retrait* retrait, void* conveyor, Product* product);
+void retrait_give_product(Retrait* retrait);
 
 #endif

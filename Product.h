@@ -38,6 +38,7 @@ typedef struct
 {
 
     Type* m__type;
+    int m__progression;
     bool m__defaillance;
 
 } Product;
@@ -46,5 +47,12 @@ Product* product_new(Type* t);
 void product_delete(Product* product);
 
 bool product_get_defaillance(Product* product);
+
+bool product_treat(Product* product);
+bool product_treated(Product* product);
+
+Type* product_get_type(Product* product);
+
+void product_display(Product* product, int* line);
 
 #endif

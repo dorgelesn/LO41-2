@@ -36,13 +36,14 @@ typedef struct
 {
 
     Machine* m__base;
+    void* m__conveyor;
 
-    Type** m__types;
+    Type* m__type;
     Product* m__product;
 
 } Table;
 
-Table* table_new(Type** types);
+Table* table_new(Type* type);
 void table_delete(Table* table);
 
 int table_start(Table* table);
@@ -52,9 +53,11 @@ void table_wake(Table* table);
 void* table_thread(void* args);
 
 void table_receive_product_conveyor(Table* table, void* conveyor, Product* product);
-void table_donner_product_conveyor(Table* table, void* conveyor);
+void table_give_product_conveyor(Table* table);
 
 Product* table_get_product(Table* table);
-bool table_is_occupe(Table* table);
+Type* table_get_type(Table* table);
+
+void table_display(Table* table, int* line);
 
 #endif

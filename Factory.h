@@ -36,7 +36,7 @@ typedef struct {
 
 } Factory;
 
-Factory* factory_new(char* products, char* types, char* tables);
+Factory* factory_new(int num_products, int num_types, int num_tables);
 void factory_delete(Factory* factory);
 
 int factory_start(Factory* factory);
